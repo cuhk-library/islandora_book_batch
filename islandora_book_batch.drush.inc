@@ -80,6 +80,10 @@ function islandora_book_batch_drush_command() {
         'description' => 'A flag to indicate the page progression for the book. If not specified will default to LR.',
         'value' => 'optional',
       ),
+      'text_progression' => array(
+        'description' => 'A flag to indicate the text progression for the book. ',
+        'value' => 'optional',
+      ),
       'output_set_id' => array(
         'description' => 'A flag to indicate whether to print the set ID of the preprocessed book.',
         'value' => 'optional',
@@ -131,6 +135,13 @@ function drush_islandora_book_batch_preprocess() {
     'page_progression' => drush_get_option('page_progression', FALSE),
   );
 
+  $text_progression = drush_get_option('text_progression', FALSE);
+  if($text_progression){
+      if ($text_progression == 'horizontal-tb' || $text_progression == 'vertical-rl' || $text_progression == 'vertical-lr') {
+           $parameters['text_progression']  = $text_progression;     
+      }
+  }
+  
   if ($content_models = drush_get_option('content_models', FALSE)) {
     $parameters['content_models'] = explode(',', $content_models);
   }
@@ -149,7 +160,7 @@ function drush_islandora_book_batch_preprocess() {
 
   // Pass the preprocessor off to run.
   $preprocessed = islandora_batch_handle_preprocessor($preprocessor);
-
+  
   if (drush_get_option('output_set_id', FALSE)) {
     drush_print($preprocessor->getSetId());
   }
@@ -160,9 +171,15 @@ function drush_islandora_book_batch_preprocess() {
  */
 function drush_islandora_book_batch_preprocess_validate() {
   $page_progression = drush_get_option('page_progression', FALSE);
+  $text_progression = drush_get_option('text_progression', FALSE);
   if ($page_progression) {
     if ($page_progression != 'lr' && $page_progression != 'rl') {
       return drush_set_error('Invalid page progression parameter.', dt('The specified page progression of @progression is not valid. Only the values "lr" or "rl" can be used.', array('@progression' => $page_progression)));
+    }
+  }
+  if ($text_progression) {
+    if ($text_progression != 'horizontal-tb' && $text_progression != 'vertical-rl' && $text_progression != 'vertical-lr') {
+      return drush_set_error('Invalid text progression parameter.', dt('The specified text progression of @progression is not valid. Only the values "horizontal-tb", "vertical-rl" or "vertical-lr" can be used.', array('@progression' => $text_progression)));
     }
   }
 }

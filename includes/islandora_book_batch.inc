@@ -403,6 +403,7 @@ class IslandoraBookBookBatchObject extends IslandoraFlatBatchObject {
     parent::addRelationships();
     module_load_include('inc', 'islandora_paged_content', 'includes/derivatives');
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
+    module_load_include('inc', 'cuhkdora', 'includes/utilities');
 
     if (isset($this->preprocessorParameters['create_pdfs']) && $this->preprocessorParameters['create_pdfs']) {
       islandora_paged_content_set_pdf_flag($this);
@@ -412,6 +413,9 @@ class IslandoraBookBookBatchObject extends IslandoraFlatBatchObject {
     }
     if (isset($this->preprocessorParameters['page_progression']) && $this->preprocessorParameters['page_progression']) {
       islandora_paged_content_set_page_progression($this, $this->preprocessorParameters['page_progression']);
+    }
+    if (isset($this->preprocessorParameters['text_progression']) && $this->preprocessorParameters['text_progression']) {
+      cuhkdora_text_block_flow_direction($this, $this->preprocessorParameters['text_progression']);
     }
     // Identify the source of this object.
     $this->relationships->add(ISLANDORA_RELS_EXT_URI, 'book-batched', 'true', RELS_TYPE_PLAIN_LITERAL);
@@ -466,6 +470,7 @@ class IslandoraBookPageBatchObject extends IslandoraFlatBatchObject {
    */
   public function addRelationships() {
     module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
+    module_load_include('inc', 'cuhkdora', 'includes/utilities');
     // Add relationship to collection.
     $rels_ext = $this->relationships;
     islandora_paged_content_set_relationship($rels_ext, ISLANDORA_RELS_EXT_URI, 'isPageOf', $this->parentId);
@@ -475,9 +480,12 @@ class IslandoraBookPageBatchObject extends IslandoraFlatBatchObject {
     islandora_paged_content_set_relationship($rels_ext, FEDORA_RELS_EXT_URI, 'isMemberOf', $this->parentId);
     // Add content model relationship.
     $this->models = 'islandora:pageCModel';
+    if (isset($this->preprocessorParameters['text_progression']) && $this->preprocessorParameters['text_progression']) {
+      cuhkdora_text_block_flow_direction($this, $this->preprocessorParameters['text_progression']);
+    }
     if (isset($this->preprocessorParameters['generate_ocr'])) {
       module_load_include('inc', 'islandora_ocr', 'includes/derivatives');
-      islandora_ocr_set_generate_ocr_rels_ext_statement($this, $this->preprocessorParameters['generate_ocr']);
+      islandora_ocr_set_generating_rels_ext_statements($this, $this->preprocessorParameters['generate_ocr']);
     }
   }
 }
