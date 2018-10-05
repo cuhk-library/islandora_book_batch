@@ -5,6 +5,7 @@ version = 7.x-dev
 core = 7.x
 dependencies[] = islandora_batch
 dependencies[] = islandora_book
+dependencies[] = cuhkdora
 files[] = includes/islandora_book_batch.inc
 php = 5.3
 
